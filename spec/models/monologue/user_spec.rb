@@ -1,19 +1,19 @@
 require 'spec_helper'
 
-describe Monologue::User do
+describe Monologue::UserRecord do
   it { validate_presence_of(:name) }
   it { validate_presence_of(:email) }
   it { validate_uniqueness_of(:email) }
 
   context "delete user" do
-    let(:user_without_post) { stub_model(Monologue::User) }
+    let(:user_without_post) { stub_model(Monologue::UserRecord) }
     let(:user_with_post) do
-      user = stub_model(Monologue::User)
-      user.stub(:posts => [stub_model(Monologue::Post)])
+      user = stub_model(Monologue::UserRecord)
+      user.stub(:posts => [stub_model(Monologue::PostRecord)])
       user
     end
 
-    let(:user) { Monologue::User.new }
+    let(:user) { Monologue::UserRecord.new }
 
     it "should be able to delete another user that does not have any posts" do
       user.can_delete?(user_without_post).should be_true

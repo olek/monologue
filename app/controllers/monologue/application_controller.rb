@@ -5,11 +5,11 @@ class Monologue::ApplicationController < ApplicationController
   before_filter :recent_posts, :all_tags
 
   def recent_posts
-    @recent_posts = Monologue::Post.published.limit(3)
+    @recent_posts = Monologue::PostRecord.published.limit(3)
   end
 
   def all_tags
-    @tags = Monologue::Tag.all(order: "name").select{|t| t.frequency>0}
+    @tags = Monologue::TagRecord.all(order: "name").select{|t| t.frequency>0}
     #could use minmax here but it's only supported with ruby > 1.9'
     @tags_frequency_min = @tags.map{|t| t.frequency}.min
     @tags_frequency_max = @tags.map{|t| t.frequency}.max
@@ -29,7 +29,7 @@ class Monologue::ApplicationController < ApplicationController
   private
 
     def monologue_current_user
-      @monologue_current_user ||= Monologue::User.find(session[:monologue_user_id]) if session[:monologue_user_id]
+      @monologue_current_user ||= Monologue::UserRecord.find(session[:monologue_user_id]) if session[:monologue_user_id]
     end
 
     def monologue_page_cache_enabled?

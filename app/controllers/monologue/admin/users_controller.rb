@@ -7,7 +7,7 @@ class Monologue::Admin::UsersController < Monologue::Admin::BaseController
   end
 
   def new
-    @user = Monologue::User.new
+    @user = Monologue::UserRecord.new
   end
 
   def update
@@ -28,7 +28,7 @@ class Monologue::Admin::UsersController < Monologue::Admin::BaseController
   end
 
   def create
-    @user = Monologue::User.new(params[:user])
+    @user = Monologue::UserRecord.new(params[:user])
     if @user.save
       flash.notice = I18n.t("monologue.admin.users.create.success")
       redirect_to admin_users_path
@@ -38,12 +38,12 @@ class Monologue::Admin::UsersController < Monologue::Admin::BaseController
   end
 
   def index
-    @users = Monologue::User.all
+    @users = Monologue::UserRecord.all
   end
 
   private
     def load_user
-      @user = Monologue::User.find(params[:id])
+      @user = Monologue::UserRecord.find(params[:id])
     end
 
 end

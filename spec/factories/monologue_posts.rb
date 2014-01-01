@@ -1,6 +1,6 @@
 # encoding: UTF-8
 FactoryGirl.define do
-  factory :post, class: Monologue::Post do
+  factory :post, class: Monologue::PostRecord do
     published true
     association :user
     sequence(:title) { |i| "post title #{i}" }
@@ -9,13 +9,13 @@ FactoryGirl.define do
     sequence(:published_at) {|i| DateTime.new(2011,1,1,12,0,17) + i.days }
   end
 
-  factory :unpublished_post, class: Monologue::Post, parent: :post do |post|
+  factory :unpublished_post, class: Monologue::PostRecord, parent: :post do |post|
     published false
     title "unpublished"
     url "unpublished"
   end
 
-  factory :post_with_tags, class: Monologue::Post, parent: :post do |post|
+  factory :post_with_tags, class: Monologue::PostRecord, parent: :post do |post|
     post.after_create { |p| p.tag!(['Rails', 'a great tag'])}
   end
 

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Monologue::Post do
+describe Monologue::PostRecord do
   before(:each) do
     @post = Factory(:post)
   end

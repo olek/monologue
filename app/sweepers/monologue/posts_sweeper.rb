@@ -1,5 +1,5 @@
 class Monologue::PostsSweeper < ActionController::Caching::Sweeper
-  observe Monologue::Post
+  observe Monologue::PostRecord
 
   def sweep(post)
     if ActionController::Base.perform_caching && Monologue::PageCache.enabled && Monologue::PageCache.wipe_enabled && Monologue::PageCache.wipe_after_save && (ActionController::Base.page_cache_directory != Rails.public_path)

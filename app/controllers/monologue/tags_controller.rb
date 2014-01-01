@@ -12,6 +12,6 @@ class Monologue::TagsController < Monologue::ApplicationController
 
   private
   def retrieve_tag
-    Monologue::Tag.where("lower(name) = ?", params[:tag].downcase).first
+    Monologue::TagRecord.where("lower(name) = ?", params[:tag].downcase).first
   end
 end

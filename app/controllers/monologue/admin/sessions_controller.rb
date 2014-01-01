@@ -5,7 +5,7 @@ class Monologue::Admin::SessionsController < Monologue::Admin::BaseController
   end
 
   def create
-    user = Monologue::User.find_by_email(params[:email])
+    user = Monologue::UserRecord.find_by_email(params[:email])
     if user && user.authenticate(params[:password])
       session[:monologue_user_id] = user.id
       redirect_to admin_url, notice: t("monologue.admin.sessions.messages.logged_in")

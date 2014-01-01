@@ -1,8 +1,22 @@
-class Monologue::Post < ActiveRecord::Base
-  has_many :taggings
+class Monologue::PostRecord < ActiveRecord::Base
+  self.table_name = 'monologue_posts'
+
+  # keeping polymorphic_url route helper happy
+  def self.model_name
+    ActiveModel::Name.new(self, Monologue, 'Monologue::Post')
+  end
+
+  # Now we need to handle case of partial rendering getting confused
+  # with wrong class... love the consistency of rails...
+  def to_partial_path
+    model_name  = self.class.model_name
+    "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
+  end
+
+  has_many :taggings, class_name: "Monologue::TaggingRecord", foreign_key: :post_id
   has_many :tags, through: :taggings, dependent: :destroy, order: :tag_id
   before_validation :generate_url
-  belongs_to :user
+  belongs_to :user, class_name: "Monologue::UserRecord"
 
   attr_accessible :title, :content, :url, :published, :published_at, :tag_list
 
@@ -26,7 +40,7 @@ class Monologue::Post < ActiveRecord::Base
 
   def tag!(tags_attr)
     self.tags = tags_attr.map(&:strip).reject(&:blank?).map do |tag|
-      Monologue::Tag.find_or_create_by_name(tag)
+      Monologue::TagRecord.find_or_create_by_name(tag)
     end
   end
 
