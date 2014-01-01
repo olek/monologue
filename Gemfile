@@ -5,6 +5,9 @@ source "http://rubygems.org"
 # development dependencies will be added by default to the :development group.
 gemspec
 
+# Development version of ORMivore, later should actually be part of gemspec
+gem "ormivore", path: '../ormivore', require: ['ormivore', 'ormivore/ar_adapter']
+
 # jquery-rails is used by the dummy application
 gem "jquery-rails"
 gem "sass-rails"
