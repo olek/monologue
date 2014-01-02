@@ -1,7 +1,9 @@
 class Monologue::Admin::PostsController < Monologue::Admin::BaseController
   respond_to :html
   cache_sweeper Monologue::PostsSweeper, only: [:create, :update, :destroy]
-  before_filter :load_post, only: [:edit, :update]
+  #before_filter :load_post, only: [:edit, :update]
+  before_filter :load_post, only: [:edit]
+  before_filter :load_post_entity, only: [:update]
   
   def index
     @posts = Monologue::PostRecord.default
@@ -22,7 +24,7 @@ class Monologue::Admin::PostsController < Monologue::Admin::BaseController
     render "/monologue/posts/show", layout: Monologue.layout || "/layouts/monologue/application"
   end
   
-  def create
+  def create_old
     @post = Monologue::PostRecord.new(params[:post])
     @post.user_id = monologue_current_user.id
     if @post.save
@@ -32,15 +34,44 @@ class Monologue::Admin::PostsController < Monologue::Admin::BaseController
     end
   end
 
+  def create
+    post_params = params[:post].reject { |k| k == 'tag_list' } # temp, figure out how to handle tags
+    post_params.merge!(user_id: monologue_current_user.id)
+    # TODO missing step with form object and validations on it
+    @post = Monologue::Post::Entity.new(post_params)
+
+    @post = repos[:post].persist(@post)
+
+    prepare_flash_and_redirect_to_edit()
+  rescue ORMivore::StorageError
+    raise
+    # we do not have validations yet to fail
+    # render :new
+  end
+
   def edit
   end
 
-  def update
+  def update_old
     if @post.update_attributes(params[:post])
       prepare_flash_and_redirect_to_edit()
     else
       render :edit
     end
+  end
+
+  def update
+    post_params = params[:post].reject { |k| k == 'tag_list' } # temp, figure out how to handle tags
+    # TODO missing step with form object and validations on it
+    @post = @post.apply(post_params)
+
+    @post = repos[:post].persist(@post)
+
+    prepare_flash_and_redirect_to_edit()
+  rescue ORMivore::StorageError
+    raise
+    # we do not have validations yet to fail
+    # render :edit
   end
 
   def destroy
@@ -57,8 +88,12 @@ private
     @post = Monologue::PostRecord.find(params[:id])
   end
 
+  def load_post_entity
+    @post = repos[:post].find_by_id(params[:id])
+  end
+
   def prepare_flash_and_redirect_to_edit
-    if @post.published_in_future? && ActionController::Base.perform_caching
+    if @post.questions.published_in_future? && ActionController::Base.perform_caching
       flash[:warning] = I18n.t("monologue.admin.posts.#{params[:action]}.saved_with_future_date_and_cache")
     else
       flash[:notice] =  I18n.t("monologue.admin.posts.#{params[:action]}.saved")
