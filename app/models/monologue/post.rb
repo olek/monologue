@@ -1,6 +1,6 @@
 class Monologue::Post < ActiveRecord::Base
   has_many :taggings
-  has_many :tags, through: :taggings, dependent: :destroy
+  has_many :tags, through: :taggings, dependent: :destroy, order: :tag_id
   before_validation :generate_url
   belongs_to :user
 
