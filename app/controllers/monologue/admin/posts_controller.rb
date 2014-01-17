@@ -68,7 +68,7 @@ module Monologue
       # TODO missing step with form object and validations on it
       @post = @post.apply(post_params)
 
-      @post = post_repo.persist(@post)
+      @post = @post.repo.persist(@post)
 
       persist_tag_list(params[:post][:tag_list])
 
@@ -108,8 +108,7 @@ module Monologue
         already_associated_tags =
           tagging_repo.find_all_by_post_id(@post.id).map { |tagging|
             matching_tag = found_tags.detect { |ft| tagging.tag_id == ft.id }
-            # TODO add support for delete in ormivore...
-            # tagging_repo.delete(tagging) unless matching_tag
+            tagging_repo.delete(tagging) unless matching_tag
             matching_tag
           }.compact
 
@@ -122,15 +121,15 @@ module Monologue
     end
 
     def post_repo
-      Repos[Post::Entity]
+      repos[Post::Entity]
     end
 
     def tag_repo
-      Repos[Tag::Entity]
+      post_repo.family[Tag::Entity]
     end
 
     def tagging_repo
-      Repos[Tagging::Entity]
+      post_repo.family[Tagging::Entity]
     end
 
     def prepare_flash_and_redirect_to_edit
