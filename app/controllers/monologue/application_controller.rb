@@ -2,8 +2,6 @@ class Monologue::ApplicationController < ApplicationController
 
   layout Monologue.layout if Monologue.layout # TODO: find a way to test that. It was asked in issue #54 (https://github.com/jipiboily/monologue/issues/54)
 
-  include Repos
-
   before_filter :recent_posts, :all_tags
 
   def recent_posts
