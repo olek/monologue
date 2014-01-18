@@ -43,7 +43,7 @@ module Monologue
 
       @post = post_repo.persist(@post)
 
-      persist_tag_list(params[:post][:tag_list])
+      @post.repo.persist_tag_list(@post, params[:post][:tag_list])
 
       prepare_flash_and_redirect_to_edit()
     rescue ORMivore::StorageError
@@ -64,13 +64,14 @@ module Monologue
     end
 
     def update
-      post_params = params[:post].reject { |k| k == 'tag_list' } # temp, figure out how to handle tags
+      # TODO form should not nest tag_list under post, but should have tag_list a top level param
+      post_params = params[:post].reject { |k| k == 'tag_list' }
       # TODO missing step with form object and validations on it
       @post = @post.apply(post_params)
 
       @post = @post.repo.persist(@post)
 
-      persist_tag_list(params[:post][:tag_list])
+      @post.repo.persist_tag_list(@post, params[:post][:tag_list])
 
       prepare_flash_and_redirect_to_edit()
     rescue ORMivore::StorageError
@@ -97,39 +98,8 @@ module Monologue
       @post = post_repo.find_by_id(params[:id])
     end
 
-    def persist_tag_list(tag_list)
-      if tag_list
-        tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
-        found_tags = tag_repo.find_all_by_names(tag_names)
-        created_tags = (tag_names - found_tags.map(&:name)).map { |tn|
-          tag_repo.persist(Tag::Entity.new(name: tn))
-        }
-
-        already_associated_tags =
-          tagging_repo.find_all_by_post_id(@post.id).map { |tagging|
-            matching_tag = found_tags.detect { |ft| tagging.tag_id == ft.id }
-            tagging_repo.delete(tagging) unless matching_tag
-            matching_tag
-          }.compact
-
-        tags_to_associate = found_tags - already_associated_tags + created_tags
-
-        tags_to_associate.each do |tag|
-          tagging_repo.persist(Tagging::Entity.new(post_id: @post.id, tag_id: tag.id))
-        end
-      end
-    end
-
     def post_repo
       repos[Post::Entity]
-    end
-
-    def tag_repo
-      post_repo.family[Tag::Entity]
-    end
-
-    def tagging_repo
-      post_repo.family[Tagging::Entity]
     end
 
     def prepare_flash_and_redirect_to_edit
