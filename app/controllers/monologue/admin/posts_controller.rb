@@ -2,9 +2,7 @@ module Monologue
   class Admin::PostsController < Monologue::Admin::BaseController
     respond_to :html
     cache_sweeper Monologue::PostsSweeper, only: [:create, :update, :destroy]
-    #before_filter :load_post, only: [:edit, :update]
-    before_filter :load_post, only: [:edit]
-    before_filter :load_post_entity, only: [:update]
+    before_filter :load_post, only: [:edit, :update]
 
     def index
       @posts = Monologue::PostRecord.default
@@ -25,59 +23,25 @@ module Monologue
       render "/monologue/posts/show", layout: Monologue.layout || "/layouts/monologue/application"
     end
 
-    def create_old
-      @post = Monologue::PostRecord.new(params[:post])
+    def create
+      @post = Post::ViewAdapter.new(post_repo)
       @post.user_id = monologue_current_user.id
-      if @post.save
+      if @post.update_attributes(params[:post])
         prepare_flash_and_redirect_to_edit()
       else
         render :new
       end
     end
 
-    def create
-      post_params = params[:post].reject { |k| k == 'tag_list' } # temp, figure out how to handle tags
-      post_params.merge!(user_id: monologue_current_user.id)
-      # TODO missing step with form object and validations on it
-      @post = Post::Entity.new(post_params)
-
-      @post = post_repo.persist(@post)
-
-      @post.repo.persist_tag_list(@post, params[:post][:tag_list])
-
-      prepare_flash_and_redirect_to_edit()
-    rescue ORMivore::StorageError
-      raise
-      # we do not have validations yet to fail
-      # render :new
-    end
-
     def edit
     end
 
-    def update_old
+    def update
       if @post.update_attributes(params[:post])
         prepare_flash_and_redirect_to_edit()
       else
         render :edit
       end
-    end
-
-    def update
-      # TODO form should not nest tag_list under post, but should have tag_list a top level param
-      post_params = params[:post].reject { |k| k == 'tag_list' }
-      # TODO missing step with form object and validations on it
-      @post = @post.apply(post_params)
-
-      @post = @post.repo.persist(@post)
-
-      @post.repo.persist_tag_list(@post, params[:post][:tag_list])
-
-      prepare_flash_and_redirect_to_edit()
-    rescue ORMivore::StorageError
-      raise
-      # we do not have validations yet to fail
-      # render :edit
     end
 
     def destroy
@@ -91,11 +55,8 @@ module Monologue
 
   private
     def load_post
-      @post = Monologue::PostRecord.find(params[:id])
-    end
-
-    def load_post_entity
-      @post = post_repo.find_by_id(params[:id])
+      #@post = Monologue::PostRecord.find(params[:id])
+      @post = Post::ViewAdapter.new(post_repo, post_repo.find_by_id(params[:id]))
     end
 
     def post_repo
@@ -103,7 +64,7 @@ module Monologue
     end
 
     def prepare_flash_and_redirect_to_edit
-      if @post.questions.published_in_future? && ActionController::Base.perform_caching
+      if @post.entity.questions.published_in_future? && ActionController::Base.perform_caching
         flash[:warning] = I18n.t("monologue.admin.posts.#{params[:action]}.saved_with_future_date_and_cache")
       else
         flash[:notice] =  I18n.t("monologue.admin.posts.#{params[:action]}.saved")
