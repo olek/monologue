@@ -5,11 +5,11 @@ module Monologue
     before_filter :load_post, only: [:edit, :update]
 
     def index
-      @posts = Monologue::PostRecord.default
+      @posts = post_repo.find_all_for_listing.map { |p| Post::ViewAdapter.new(p) }
     end
 
     def new
-      @post = Monologue::PostRecord.new
+      @post = Post::ViewAdapter.new(post_repo.create)
     end
 
     ## Preview a post without saving.
@@ -46,12 +46,11 @@ module Monologue
     end
 
     def destroy
-      post = Monologue::PostRecord.find(params[:id])
-      if post.destroy
-        redirect_to admin_posts_path, notice:  I18n.t("monologue.admin.posts.delete.removed")
-      else
-        redirect_to admin_posts_path, alert: I18n.t("monologue.admin.posts.delete.failed")
-      end
+      post = post_repo.find_by_id(params[:id])
+      post_repo.delete(post)
+      redirect_to admin_posts_path, notice:  I18n.t("monologue.admin.posts.delete.removed")
+    rescue ORMivore::StorageError
+      redirect_to admin_posts_path, alert: I18n.t("monologue.admin.posts.delete.failed")
     end
 
   private
@@ -65,7 +64,7 @@ module Monologue
     end
 
     def prepare_flash_and_redirect_to_edit
-      if @post.entity.questions.published_in_future? && ActionController::Base.perform_caching
+      if @post.published_in_future? && ActionController::Base.perform_caching
         flash[:warning] = I18n.t("monologue.admin.posts.#{params[:action]}.saved_with_future_date_and_cache")
       else
         flash[:notice] =  I18n.t("monologue.admin.posts.#{params[:action]}.saved")

@@ -12,9 +12,6 @@ module Monologue
         user_id: Integer
       )
 
-      # TODO come back to this defficiency later
-      optional :title, :content, :url, :published, :published_at, :user_id
-
       def questions
         @questions ||= Questions.new(self)
       end

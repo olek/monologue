@@ -5,6 +5,24 @@ module Monologue
 
       self.default_entity_class = Entity
 
+      def delete(post)
+        # TODO not the most efficient way to destroy/delete taggings, may do in one query
+        post.relations.taggings.each do |tagging|
+          family[Tagging::Entity].delete(tagging)
+        end
+
+        super
+      end
+
+      def find_all_for_listing
+        entities_attrs = port.find(
+          {},
+          [:id].concat(entity_class.attributes_list),
+          order: { published_at: :descending, id: :descending }
+        )
+        entities_attrs.map { |ea| attrs_to_entity(ea) }
+      end
+
       def persist_tag_list(post, tag_list)
         # TODO need proper way to figure out if entity is persisted yet
         raise ORMivore::StorageError, "Post not persisted yet" unless post.id

@@ -22,8 +22,6 @@ module Monologue
       attr_entity(*Entity.attributes_declaration.keys)
       attr_entity :id
 
-      attr_reader :entity
-
       attr_accessible :title, :content, :url, :published, :published_at, :tag_list
 
       validates :user_id, presence: true
@@ -41,7 +39,7 @@ module Monologue
         if @tag_list
           @tag_list
         else
-          tags = repo.family[Tag::Entity].find_all_by_post_id(entity.id)
+          tags = entity.relations.tags
           @tag_list = tags.map(&:name).join(', ')
         end
       end
@@ -73,6 +71,10 @@ module Monologue
         else
           false
         end
+      end
+
+      def published_in_future?
+        entity.questions.published_in_future?
       end
 
       def full_url
@@ -112,7 +114,7 @@ module Monologue
 
       private
 
-      attr_writer :entity
+      attr_accessor :entity
       attr_reader :repo
 
       def url_do_not_start_with_slash
