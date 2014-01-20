@@ -19,4 +19,3 @@ module Monologue
     end
   end
 end
-

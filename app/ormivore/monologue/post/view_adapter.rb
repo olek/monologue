@@ -32,18 +32,17 @@ module Monologue
       # validates :url, uniqueness: true
       validate :url_do_not_start_with_slash
 
-      def initialize(repo, entity = nil)
-        @repo = repo
-        @entity = entity || Entity.new({})
+      def initialize(entity)
+        @entity = entity
+        @repo = entity.repo
       end
 
       def tag_list
         if @tag_list
           @tag_list
         else
-          taggings = repo.family[Tagging::Entity].find_all_by_post_id(entity.id)
-          tags = repo.family[Tag::Entity].find_by_ids(taggings.map(&:tag_id).sort)
-          @tag_list = tags.values.map(&:name).join(', ')
+          tags = repo.family[Tag::Entity].find_all_by_post_id(entity.id)
+          @tag_list = tags.map(&:name).join(', ')
         end
       end
 
@@ -74,6 +73,24 @@ module Monologue
         else
           false
         end
+      end
+
+      def full_url
+        "#{Monologue::Engine.routes.url_helpers.root_path}#{self.url}"
+      end
+
+      def user
+        # TODO shall use User::ViewAdapter around user_id
+        Monologue::UserRecord.find(user_id)
+      end
+
+      def tags
+        # limitation - new tags are not previewed
+        tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
+        # TODO shall use User::TagAdapter
+        #tag_repo = post_repo.family[Tag::Entity]
+        #@tags = tag_names.empty? ?  [] : tag_repo.find_all_by_name(tag_names).map { |t| Tag::ViewAdapter.new(t) }
+        tag_names.empty? ?  [] : TagRecord.find_all_by_name(tag_names)
       end
 
       # keeping polymorphic_url route helper happy

@@ -19,6 +19,10 @@ module Monologue
         @questions ||= Questions.new(self)
       end
 
+      def relations
+        @relations ||= Relations.new(self)
+      end
+
       def actions
         @actions ||= Actions.new(self)
       end

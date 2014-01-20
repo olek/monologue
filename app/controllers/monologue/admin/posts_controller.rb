@@ -15,7 +15,8 @@ module Monologue
     ## Preview a post without saving.
     def preview
       # mockup our models for preview.
-      @post = Monologue::PostRecord.new(params[:post])
+      @post = Post::ViewAdapter.new(post_repo.create)
+      @post.assign_attributes(params[:post])
       @post.user_id = monologue_current_user.id
       @post.published_at = Time.zone.now
 
@@ -24,7 +25,7 @@ module Monologue
     end
 
     def create
-      @post = Post::ViewAdapter.new(post_repo)
+      @post = Post::ViewAdapter.new(post_repo.create)
       @post.user_id = monologue_current_user.id
       if @post.update_attributes(params[:post])
         prepare_flash_and_redirect_to_edit()
@@ -56,7 +57,7 @@ module Monologue
   private
     def load_post
       #@post = Monologue::PostRecord.find(params[:id])
-      @post = Post::ViewAdapter.new(post_repo, post_repo.find_by_id(params[:id]))
+      @post = Post::ViewAdapter.new(post_repo.find_by_id(params[:id]))
     end
 
     def post_repo
