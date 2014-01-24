@@ -30,7 +30,7 @@ module Monologue
         tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
         found_tags = tag_repo.find_all_by_name(tag_names)
         created_tags = (tag_names - found_tags.map(&:name)).map { |tn|
-          tag_repo.persist(Tag::Entity.new(name: tn))
+          tag_repo.persist(Tag::Entity.new.apply(name: tn))
         }
 
         tagging_join_table.associate(post, found_tags + created_tags)
@@ -70,7 +70,7 @@ module Monologue
           joinee_to_associate = new_joinees - already_associated_joinees
 
           joinee_to_associate.each do |joinee|
-            repo.persist(entity_class.new(this_fk => this.id, other_fk => joinee.id))
+            repo.persist(entity_class.new.apply(this_fk => this.id, other_fk => joinee.id))
           end
         end
 
