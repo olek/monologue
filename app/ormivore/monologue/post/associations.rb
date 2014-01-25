@@ -1,7 +1,8 @@
 module Monologue
   module Post
-    class Relations
-      include ORMivore::Entity::Relations
+    class Associations
+      extend ORMivore::Entity::Memoize
+      include ORMivore::Entity::Wrapper
 
       memoize {
         def user

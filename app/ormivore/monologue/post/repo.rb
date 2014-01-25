@@ -7,7 +7,7 @@ module Monologue
 
       def delete(post)
         # TODO not the most efficient way to destroy/delete taggings, may do in one query
-        post.relations.taggings.each do |tagging|
+        post.associations.taggings.each do |tagging|
           family[Tagging::Entity].delete(tagging)
         end
 
@@ -47,7 +47,7 @@ module Monologue
         )
       end
 
-      # TODO JoinTable probably should be defined in ORMivore, specialized in Tagging::Entity.relations, and created here
+      # TODO JoinTable probably should be defined in ORMivore, specialized in Tagging::Entity.associations, and created here
       class JoinTable
         def initialize(options)
           @repo = options.fetch(:repo)

@@ -39,7 +39,7 @@ module Monologue
         if @tag_list
           @tag_list
         else
-          tags = entity.relations.tags
+          tags = entity.associations.tags
           @tag_list = tags.map(&:name).join(', ')
         end
       end

@@ -16,8 +16,8 @@ module Monologue
         @questions ||= Questions.new(self)
       end
 
-      def relations
-        @relations ||= Post::Relations.new(self)
+      def associations
+        @associations ||= Associations.new(self)
       end
 
       def actions
