@@ -1,24 +1,21 @@
 module Monologue
   module Post
     class Relations
-      def initialize(entity)
-        @entity = entity
-      end
+      include ORMivore::Entity::Relations
 
-      def user
-        entity.repo.family[User::Entity].find_by_id(entity.user_id)
-      end
+      memoize {
+        def user
+          entity.repo.family[User::Entity].find_by_id(entity.user_id)
+        end
 
-      def taggings
-        entity.repo.family[Tagging::Entity].find_all_by_post_id(entity.id)
-      end
+        def taggings
+          entity.repo.family[Tagging::Entity].find_all_by_post_id(entity.id)
+        end
 
-      def tags
-        entity.repo.family[Tag::Entity].find_all_by_post_id(entity.id)
-      end
-
-      private
-      attr_reader :entity
+        def tags
+          entity.repo.family[Tag::Entity].find_all_by_post_id(entity.id)
+        end
+      }
     end
   end
 end

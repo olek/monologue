@@ -17,7 +17,7 @@ module Monologue
       end
 
       def relations
-        @relations ||= Relations.new(self)
+        @relations ||= Post::Relations.new(self)
       end
 
       def actions
