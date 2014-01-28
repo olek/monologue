@@ -12,17 +12,10 @@ module Monologue
         user_id: Integer
       )
 
-      def questions
-        @questions ||= Questions.new(self)
-      end
+      associations Associations
 
-      def associations
-        @associations ||= Associations.new(self)
-      end
-
-      def actions
-        @actions ||= Actions.new(self)
-      end
+      responsibility :questions, Questions
+      responsibility :actions, Actions
     end
   end
 end

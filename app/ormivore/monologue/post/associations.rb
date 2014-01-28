@@ -1,22 +1,13 @@
 module Monologue
   module Post
     class Associations
-      extend ORMivore::Entity::Memoize
-      include ORMivore::Entity::Wrapper
+      extend ORMivore::Entity::AssociationsDSL
 
-      memoize {
-        def user
-          entity.repo.family[User::Entity].find_by_id(entity.user_id)
-        end
+      many_to_one :user, User::Entity, fk: 'user_id'
 
-        def taggings
-          entity.repo.family[Tagging::Entity].find_all_by_post_id(entity.id)
-        end
+      one_to_many :taggings, Tagging::Entity, fk: 'post_id'
 
-        def tags
-          entity.repo.family[Tag::Entity].find_all_by_post_id(entity.id)
-        end
-      }
+      many_to_many :tags, Tag::Entity, through: 'taggings', fk: 'tag_id'
     end
   end
 end
