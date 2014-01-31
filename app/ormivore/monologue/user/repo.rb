@@ -8,7 +8,7 @@ module Monologue
       def find_by_name(name)
         entities_attrs = port.find(
           { name: name },
-          [:id].concat(entity_class.attributes_list),
+          columns_to_fetch,
           limit: 1
         )
         entities_attrs.map { |ea| attrs_to_entity(ea) }.first

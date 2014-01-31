@@ -8,7 +8,7 @@ module Monologue
       def find_all_by_post_id(post_id)
         entities_attrs = port.find(
           { post_id: post_id },
-          [:id].concat(entity_class.attributes_list)
+          columns_to_fetch
         )
 
         entities_attrs.map { |ea| attrs_to_entity(ea) }

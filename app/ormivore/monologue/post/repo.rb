@@ -17,7 +17,7 @@ module Monologue
       def find_all_for_listing
         entities_attrs = port.find(
           {},
-          [:id].concat(entity_class.attributes_list),
+          columns_to_fetch,
           order: { published_at: :descending, id: :descending }
         )
         entities_attrs.map { |ea| attrs_to_entity(ea) }

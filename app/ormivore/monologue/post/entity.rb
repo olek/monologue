@@ -9,7 +9,6 @@ module Monologue
         url: String,
         published: Boolean,
         published_at: Time,
-        user_id: Integer
       )
 
       many_to_one :user, User::Entity, fk: 'user_id'
