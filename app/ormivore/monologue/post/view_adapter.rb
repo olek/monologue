@@ -20,7 +20,7 @@ module Monologue
       end
 
       attr_entity(*Entity.attributes_declaration.keys)
-      attr_entity :id
+      attr_entity :id, :user_id
 
       attr_accessible :title, :content, :url, :published, :published_at, :tag_list
 
@@ -39,7 +39,7 @@ module Monologue
         if @tag_list
           @tag_list
         else
-          tags = entity.associations.tags
+          tags = entity.tags
           @tag_list = tags.map(&:name).join(', ')
         end
       end
@@ -131,8 +131,19 @@ module Monologue
       end
 
       def persist
+        if tag_list
+          tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
+          tag_repo = repo.family[Tag::Entity]
+          existing_tags = tag_repo.find_all_by_name(tag_names)
+          created_tags = tag_names.each_with_object([]) { |tag_name, acc|
+            unless existing_tags.any? { |et| et.name == tag_name }
+              acc << tag_repo.create(name: tag_name)
+            end
+          }
+          self.entity = entity.apply(tags: existing_tags + created_tags)
+        end
+
         self.entity = repo.persist(entity)
-        repo.persist_tag_list(entity, tag_list) if tag_list
       end
     end
   end

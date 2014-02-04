@@ -12,8 +12,8 @@ module Monologue
       )
 
       many_to_one :user, User::Entity, fk: 'user_id'
-      one_to_many :taggings, Tagging::Entity, fk: 'post_id'
-      many_to_many :tags, Tag::Entity, through: 'taggings', fk: 'tag_id'
+      one_to_many :taggings, Tagging::Entity, inverse_of: :post
+      many_to_many :tags, Tag::Entity, through: 'taggings', source: 'tag'
 
       responsibility :questions, Questions
       responsibility :actions, Actions
