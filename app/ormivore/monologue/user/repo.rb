@@ -5,14 +5,7 @@ module Monologue
 
       self.default_entity_class = Entity
 
-      def find_by_name(name)
-        entities_attrs = port.find(
-          { name: name },
-          columns_to_fetch,
-          limit: 1
-        )
-        entities_attrs.map { |ea| attrs_to_entity(ea) }.first
-      end
+      find :first, by: 'name'
     end
   end
 end

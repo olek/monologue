@@ -22,6 +22,11 @@ module Monologue
       attr_entity(*Entity.attributes_declaration.keys)
       attr_entity :id, :user_id
 
+      def user_id=(id)
+        user_repo = repo.family[User::Entity]
+        self.entity = entity.apply(user: user_repo.find_by_id(id))
+      end
+
       attr_accessible :title, :content, :url, :published, :published_at, :tag_list
 
       validates :user_id, presence: true
@@ -132,15 +137,25 @@ module Monologue
 
       def persist
         if tag_list
-          tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
-          tag_repo = repo.family[Tag::Entity]
-          existing_tags = tag_repo.find_all_by_name(tag_names)
-          created_tags = tag_names.each_with_object([]) { |tag_name, acc|
-            unless existing_tags.any? { |et| et.name == tag_name }
-              acc << tag_repo.create(name: tag_name)
+          if tag_list.empty?
+            self.entity = entity.apply(tags: [])
+          else
+            tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
+            tag_repo = repo.family[Tag::Entity]
+            existing_tags = tag_repo.find_all_by_name(tag_names)
+            created_tags = tag_names.each_with_object([]) { |tag_name, acc|
+              unless existing_tags.any? { |et| et.name == tag_name }
+                acc << tag_repo.persist(tag_repo.create(name: tag_name))
+              end
+            }
+            new_tags = existing_tags + created_tags
+
+            unless new_tags.empty?
+              # TODO make this work around for missing id on new entity unnesessary
+              self.entity = repo.persist(entity) unless entity.persisted?
+              self.entity = entity.apply(tags: new_tags)
             end
-          }
-          self.entity = entity.apply(tags: existing_tags + created_tags)
+          end
         end
 
         self.entity = repo.persist(entity)
