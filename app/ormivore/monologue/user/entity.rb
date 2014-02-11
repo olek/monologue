@@ -3,11 +3,9 @@ module Monologue
     class Entity
       include ORMivore::Entity
 
-      attributes(
-        name: String,
-        email: String,
-        password_digest: String
-      )
+      attributes do
+        string :name, :email, :password_digest
+      end
 
       one_to_many :posts, Post::Entity, inverse_of: :user
     end

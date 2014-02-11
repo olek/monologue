@@ -3,9 +3,9 @@ module Monologue
     class Entity
       include ORMivore::Entity
 
-      attributes(
-        name: String
-      )
+      attributes do
+        string :name
+      end
     end
   end
 end

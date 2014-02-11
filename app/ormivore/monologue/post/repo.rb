@@ -3,8 +3,6 @@ module Monologue
     class Repo
       include ORMivore::Repo
 
-      self.default_entity_class = Entity
-
       def delete(post)
         # TODO not the most efficient way to destroy/delete taggings, may do in one query
         post.associations.taggings.each do |tagging|
