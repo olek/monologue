@@ -54,7 +54,7 @@ module Monologue
       end
 
       def persisted?
-        !(self.id.nil?)
+        entity.durable? || entity.revised?
       end
 
       def update_attributes(values, options = {})
@@ -152,7 +152,7 @@ module Monologue
 
             unless new_tags.empty?
               # TODO make this work around for missing id on new entity unnesessary
-              self.entity = repo.persist(entity) unless entity.persisted?
+              self.entity = repo.persist(entity) if entity.ephemeral?
               self.entity = entity.apply(tags: new_tags)
             end
           end
