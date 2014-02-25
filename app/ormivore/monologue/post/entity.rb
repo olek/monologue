@@ -3,6 +3,8 @@ module Monologue
     class Entity
       include ORMivore::Entity
 
+      shorthand :post
+
       attributes do
         string :title, :content, :url
         boolean :published

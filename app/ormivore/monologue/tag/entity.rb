@@ -3,6 +3,8 @@ module Monologue
     class Entity
       include ORMivore::Entity
 
+      shorthand :tag
+
       attributes do
         string :name
       end
