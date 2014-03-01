@@ -5,8 +5,10 @@ module Monologue
 
       shorthand :tagging
 
-      one_to_one :post, Post::Entity, fk: 'post_id', inverse_of: :taggings
-      one_to_one :tag, Tag::Entity, fk: 'tag_id'
+      attributes do
+        integer :post_id
+        integer :tag_id
+      end
     end
   end
 end

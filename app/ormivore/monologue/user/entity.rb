@@ -9,7 +9,7 @@ module Monologue
         string :name, :email, :password_digest
       end
 
-      one_to_many :posts, Post::Entity, inverse_of: :user
+      #one_to_many :posts, Post::Entity, inverse_of: :user
     end
   end
 end
