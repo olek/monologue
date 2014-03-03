@@ -4,6 +4,7 @@ module Monologue
       include ORMivore::Repo
 
       find :all, by: 'name'
+      find :first, by: 'name'
     end
   end
 end
