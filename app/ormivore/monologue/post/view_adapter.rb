@@ -20,35 +20,13 @@ module Monologue
       end
 
       attr_entity(*Entity.attributes_list)
-      attr_entity :user_id
 
       def id
         entity.identity
       end
 
-      attr_accessible :title, :content, :url, :published, :published_at, :tag_list
-
-      validates :user_id, presence: true
-      validates :title, :content, :url, :published_at, presence: true
-      # TODO how to validate uniqueness ?
-      # validates :url, uniqueness: true
-      validate :url_do_not_start_with_slash
-
       def initialize(entity)
         @entity = entity
-      end
-
-      def tag_list
-        if @tag_list
-          @tag_list
-        else
-          tags = session.association(entity, :tags).values
-          @tag_list = tags.map(&:name).join(', ')
-        end
-      end
-
-      def tag_list=(value)
-        @tag_list = value
       end
 
       def persisted?
@@ -76,6 +54,46 @@ module Monologue
         end
       end
 
+      # keeping polymorphic_url route helper happy
+      def self.model_name
+        ActiveModel::Name.new(self, Monologue, 'Monologue::Post')
+      end
+
+      # just maintaining compatability with existing locale files
+      def self.i18n_scope
+        :activerecord
+      end
+
+      # Now we need to handle case of partial rendering getting confused
+      # with wrong class... love the consistency of rails...
+      def to_partial_path
+        model_name  = self.class.model_name
+        "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
+      end
+
+      # variable part
+
+      attr_accessible :title, :content, :url, :published, :published_at, :tag_list
+
+      validates :user_id, presence: true
+      validates :title, :content, :url, :published_at, presence: true
+      # TODO how to validate uniqueness ?
+      # validates :url, uniqueness: true
+      validate :url_do_not_start_with_slash
+
+      def tag_list
+        if @tag_list
+          @tag_list
+        else
+          tags = session.association(entity, :tags).values
+          @tag_list = tags.map(&:name).join(', ')
+        end
+      end
+
+      def tag_list=(value)
+        @tag_list = value
+      end
+
       def published_in_future?
         entity.questions.published_in_future?
       end
@@ -92,27 +110,7 @@ module Monologue
       def tags
         # limitation - new tags are not previewed
         tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
-        # TODO shall use User::TagAdapter
-        #tag_repo = post_repo.family[Tag::Entity]
-        #@tags = tag_names.empty? ?  [] : tag_repo.find_all_by_name(tag_names).map { |t| Tag::ViewAdapter.new(t) }
-        tag_names.empty? ?  [] : TagRecord.find_all_by_name(tag_names)
-      end
-
-      # keeping polymorphic_url route helper happy
-      def self.model_name
-        ActiveModel::Name.new(self, Monologue, 'Monologue::Post')
-      end
-
-      # just maintaining compatability with existing locale files
-      def self.i18n_scope
-        :activerecord
-      end
-
-      # Now we need to handle case of partial rendering getting confused
-      # with wrong class... love the consistency of rails...
-      def to_partial_path
-        model_name  = self.class.model_name
-        "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
+        tag_names.empty? ?  [] : session.repo.tag.find_all_by_name(tag_names).map { |t| Tag::ViewAdapter.new(t) }
       end
 
       private

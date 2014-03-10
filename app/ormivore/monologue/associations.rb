@@ -20,6 +20,7 @@ module Monologue
       from Tagging::Entity
       to Tag::Entity
       as :tag
+      reverse_as :many, :taggings
     end
 
     transitive_association do
@@ -28,6 +29,14 @@ module Monologue
       as :tags
       via :incidental, :taggings
       linked_by :tag
+    end
+
+    transitive_association do
+      from Tag::Entity
+      to Post::Entity
+      as :posts
+      via :incidental, :taggings
+      linked_by :post
     end
   end
 end
