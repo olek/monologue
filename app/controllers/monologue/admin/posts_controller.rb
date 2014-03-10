@@ -55,12 +55,11 @@ module Monologue
 
   private
     def load_post
-      #@post = Monologue::PostRecord.find(params[:id])
       @post = Post::ViewAdapter.new(post_repo.find_by_id(params[:id]))
     end
 
     def post_repo
-      repos[Post::Entity]
+      storage_session.repo.post
     end
 
     def prepare_flash_and_redirect_to_edit

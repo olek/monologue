@@ -19,12 +19,11 @@ module Monologue
         end
       end
 
-      attr_entity(*Entity.attributes_declaration.keys)
-      attr_entity :id, :user_id
+      attr_entity(*Entity.attributes_list)
+      attr_entity :user_id
 
-      def user_id=(id)
-        user_repo = repo.family[User::Entity]
-        self.entity = entity.apply(user: user_repo.find_by_id(id))
+      def id
+        entity.identity
       end
 
       attr_accessible :title, :content, :url, :published, :published_at, :tag_list
@@ -37,14 +36,13 @@ module Monologue
 
       def initialize(entity)
         @entity = entity
-        @repo = entity.repo
       end
 
       def tag_list
         if @tag_list
           @tag_list
         else
-          tags = entity.tags
+          tags = session.association(entity, :tags).values
           @tag_list = tags.map(&:name).join(', ')
         end
       end
@@ -120,7 +118,10 @@ module Monologue
       private
 
       attr_accessor :entity
-      attr_reader :repo
+
+      def session
+        entity.session
+      end
 
       def url_do_not_start_with_slash
         errors.add(:url, I18n.t("activerecord.errors.models.monologue/post.attributes.url.start_with_slash")) if url && url.start_with?("/")
@@ -138,27 +139,27 @@ module Monologue
       def persist
         if tag_list
           if tag_list.empty?
-            self.entity = entity.apply(tags: [])
+            session.association(entity, :tags).clear
           else
             tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
-            tag_repo = repo.family[Tag::Entity]
+            tag_repo = session.repo.tag
             existing_tags = tag_repo.find_all_by_name(tag_names)
             created_tags = tag_names.each_with_object([]) { |tag_name, acc|
               unless existing_tags.any? { |et| et.name == tag_name }
-                acc << tag_repo.persist(tag_repo.create(name: tag_name))
+                acc << tag_repo.create(name: tag_name)
               end
             }
             new_tags = existing_tags + created_tags
 
             unless new_tags.empty?
-              # TODO make this work around for missing id on new entity unnesessary
-              self.entity = repo.persist(entity) if entity.ephemeral?
-              self.entity = entity.apply(tags: new_tags)
+              session.association(entity, :tags).set(*new_tags)
             end
           end
         end
 
-        self.entity = repo.persist(entity)
+        session.commit
+
+        self.entity = entity.current
       end
     end
   end

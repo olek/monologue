@@ -5,8 +5,8 @@ module Monologue
 
     before_filter :recent_posts, :all_tags
 
-    def repos
-      Repos
+    def storage_session
+      @storage_session ||= ORMivore::Session.new(Repos, Associations)
     end
 
     def recent_posts
