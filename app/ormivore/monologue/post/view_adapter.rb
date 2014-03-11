@@ -1,77 +1,9 @@
 module Monologue
   module Post
     class ViewAdapter
-      extend ActiveModel::Naming
-      include ActiveModel::Validations
-      include ActiveModel::Conversion
-      include ActiveModel::MassAssignmentSecurity
+      include ViewAdapterMixin
 
-      def self.attr_entity(*attrs)
-        attrs.map(&:to_s).each do |attr|
-          module_eval(<<-EOS)
-            def #{attr}
-              entity.#{attr}
-            end
-            def #{attr}=(value)
-              self.entity = entity.apply(#{attr}: value)
-            end
-          EOS
-        end
-      end
-
-      attr_entity(*Entity.attributes_list)
-
-      def id
-        entity.identity
-      end
-
-      def initialize(entity)
-        @entity = entity
-      end
-
-      def persisted?
-        entity.durable? || entity.revised?
-      end
-
-      def update_attributes(values, options = {})
-        assign_attributes(values, options)
-
-        save
-      end
-
-      def assign_attributes(values, options = {})
-        apply_sanitized_attributes(sanitize_for_mass_assignment(values, options[:as]))
-      end
-
-      def save
-        generate_url
-
-        if valid?
-          persist
-          true
-        else
-          false
-        end
-      end
-
-      # keeping polymorphic_url route helper happy
-      def self.model_name
-        ActiveModel::Name.new(self, Monologue, 'Monologue::Post')
-      end
-
-      # just maintaining compatability with existing locale files
-      def self.i18n_scope
-        :activerecord
-      end
-
-      # Now we need to handle case of partial rendering getting confused
-      # with wrong class... love the consistency of rails...
-      def to_partial_path
-        model_name  = self.class.model_name
-        "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
-      end
-
-      # variable part
+      entity Entity
 
       attr_accessible :title, :content, :url, :published, :published_at, :tag_list
 
@@ -115,19 +47,13 @@ module Monologue
 
       private
 
-      attr_accessor :entity
-
-      def session
-        entity.session
+      def apply_sanitized_attributes(values)
+        super(values.reject { |k| k.to_sym == :tag_list })
+        self.tag_list = values[:tag_list] if values[:tag_list]
       end
 
       def url_do_not_start_with_slash
         errors.add(:url, I18n.t("activerecord.errors.models.monologue/post.attributes.url.start_with_slash")) if url && url.start_with?("/")
-      end
-
-      def apply_sanitized_attributes(values)
-        self.entity = entity.apply(values.reject { |k| k.to_sym == :tag_list })
-        self.tag_list = values[:tag_list] if values[:tag_list]
       end
 
       def generate_url
@@ -155,9 +81,7 @@ module Monologue
           end
         end
 
-        session.commit
-
-        self.entity = entity.current
+        super
       end
     end
   end
