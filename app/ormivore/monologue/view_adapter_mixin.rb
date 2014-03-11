@@ -33,64 +33,69 @@ module Monologue
       base.send(:include, ActiveModel::MassAssignmentSecurity)
  
       base.extend ClassMethods
+      # can not just hame methods in ViewAdapterMixin module because
+      # they have to be mixed in last, not first
+      base.send(:include, InstanceMethods)
     end
 
-    def id
-      entity.identity
-    end
-
-    def initialize(entity)
-      @entity = entity
-    end
-
-    def persisted?
-      entity.durable? || entity.revised?
-    end
-
-    def update_attributes(values, options = {})
-      assign_attributes(values, options)
-
-      save
-    end
-
-    def assign_attributes(values, options = {})
-      apply_sanitized_attributes(sanitize_for_mass_assignment(values, options[:as]))
-    end
-
-    def save
-      generate_url
-
-      if valid?
-        persist
-        true
-      else
-        false
+    module InstanceMethods
+      def id
+        entity.identity
       end
-    end
 
-    # Now we need to handle case of partial rendering getting confused
-    # with wrong class... love the consistency of rails...
-    def to_partial_path
-      model_name  = self.class.model_name
-      "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
-    end
+      def initialize(entity)
+        @entity = entity
+      end
 
-    private
+      def persisted?
+        entity.durable? || entity.revised?
+      end
 
-    attr_accessor :entity
+      def update_attributes(values, options = {})
+        assign_attributes(values, options)
 
-    def session
-      entity.session
-    end
+        save
+      end
 
-    def apply_sanitized_attributes(values)
-      self.entity = entity.apply(values)
-    end
+      def assign_attributes(values, options = {})
+        apply_sanitized_attributes(sanitize_for_mass_assignment(values, options[:as]))
+      end
 
-    def persist
-      session.commit
+      def save
+        generate_url
 
-      self.entity = entity.current
+        if valid?
+          persist
+          true
+        else
+          false
+        end
+      end
+
+      # Now we need to handle case of partial rendering getting confused
+      # with wrong class... love the consistency of rails...
+      def to_partial_path
+        model_name  = self.class.model_name
+        "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
+      end
+
+      private
+
+      attr_accessor :entity
+
+      def session
+        entity.session
+      end
+
+      def apply_sanitized_attributes(values)
+        self.entity = entity.apply(values)
+      end
+
+      def persist
+        session.commit
+
+        self.entity = entity.current
+      end
     end
   end
 end

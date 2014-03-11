@@ -36,7 +36,8 @@ module Monologue
 
       def user
         # TODO shall use User::ViewAdapter around user_id
-        Monologue::UserRecord.find(user_id)
+        #Monologue::UserRecord.find(user_id)
+        User::ViewAdapter.new(session.association(entity, :user).value)
       end
 
       def tags
