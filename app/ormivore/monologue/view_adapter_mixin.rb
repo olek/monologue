@@ -62,8 +62,6 @@ module Monologue
       end
 
       def save
-        generate_url
-
         if valid?
           persist
           true

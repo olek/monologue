@@ -35,8 +35,6 @@ module Monologue
       end
 
       def user
-        # TODO shall use User::ViewAdapter around user_id
-        #Monologue::UserRecord.find(user_id)
         User::ViewAdapter.new(session.association(entity, :user).value)
       end
 
@@ -44,6 +42,11 @@ module Monologue
         # limitation - new tags are not previewed
         tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
         tag_names.empty? ?  [] : session.repo.tag.find_all_by_name(tag_names).map { |t| Tag::ViewAdapter.new(t) }
+      end
+
+      def save
+        generate_url
+        super
       end
 
       private
