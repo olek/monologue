@@ -1,11 +1,11 @@
 module Monologue
-  class Admin::PostsController < Monologue::Admin::BaseController
+  class Admin::PostsController < Admin::BaseController
     respond_to :html
     cache_sweeper Monologue::PostsSweeper, only: [:create, :update, :destroy]
     before_filter :load_post, only: [:edit, :update]
 
     def index
-      @posts = post_repo.find_all_for_listing.map { |p| Post::ViewAdapter.new(p) }
+      @posts = post_repo.find_all_for_admin_listing.map { |p| Post::ViewAdapter.new(p) }
     end
 
     def new

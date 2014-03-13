@@ -5,6 +5,7 @@ module Monologue
 
       find :all, limit: 300
       find :first, by: 'name'
+      find :first, by: 'email'
     end
   end
 end
