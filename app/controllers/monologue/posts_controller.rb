@@ -4,10 +4,9 @@ module Monologue
 
     def index
       @page = params[:page].nil? ? 1 : params[:page]
-      # TODO figure out how to implement paging
-      #@posts = Monologue::PostRecord.published.page(@page)
-      @posts = post_repo.find_all_for_reader_listing.map { |p| Post::ViewAdapter.new(p) }
-      def @posts.total_pages; 1; end
+      # @posts = Monologue::PostRecord.published.page(@page)
+      @posts, @total_posts = post_repo.paginate_reader_listing(@page)
+      @posts = @posts.map { |p| Post::ViewAdapter.new(p) }
     end
 
     def show
