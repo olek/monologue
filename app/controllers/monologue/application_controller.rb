@@ -34,7 +34,12 @@ module Monologue
     private
 
       def monologue_current_user
-        @monologue_current_user ||= Monologue::UserRecord.find(session[:monologue_user_id]) if session[:monologue_user_id]
+        if session[:monologue_user_id]
+          @monologue_current_user ||=
+            Monologue::User::ViewAdapter.new(
+              storage_session.repo.user.find_by_id(session[:monologue_user_id])
+            )
+        end
       end
 
       def monologue_page_cache_enabled?

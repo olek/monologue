@@ -30,7 +30,7 @@ describe "users" do
 
     it "validates user password and confirmation match" do
       fill_in "user_password", with: "password"
-      fill_in "user_password", with: "password2"
+      fill_in "user_password_confirmation", with: "password2"
       click_button "Save"
       page.should have_content(I18n.t("activerecord.errors.models.monologue/user.attributes.password.confirmation"))
     end

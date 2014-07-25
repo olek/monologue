@@ -10,6 +10,8 @@ module Monologue
 
       has_secure_password
 
+      validates_presence_of :password_confirmation, if: :password
+
       validates_presence_of :password, on: :create
       validates_presence_of :name
       # TODO how to validate uniqueness?
@@ -18,8 +20,9 @@ module Monologue
       def apply_sanitized_attributes(values)
         reject_list = %w(password password_confirmation).map(&:to_sym)
         super(values.reject { |k| reject_list.include?(k.to_sym) })
-        password = values[:password] || values['password']
-        self.password = password if password
+        # TODO allow easier assignment of transient attributes
+        self.password = values[:password] || values['password']
+        self.password_confirmation = values[:password_confirmation] || values['password_confirmation']
       end
 
       def posts
@@ -28,9 +31,10 @@ module Monologue
         }
       end
 
+      # TODO business logic does not belong here; find better place for it!
       def can_delete?(user)
-        return false if self==user
-        return false if session.association(user, :posts).values.any?
+        return false if self == user
+        return false if user.posts.any?
         true
       end
     end

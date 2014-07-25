@@ -33,7 +33,7 @@ module Monologue
       base.send(:include, ActiveModel::MassAssignmentSecurity)
  
       base.extend ClassMethods
-      # can not just hame methods in ViewAdapterMixin module because
+      # can not just have methods in ViewAdapterMixin module because
       # they have to be mixed in last, not first
       base.send(:include, InstanceMethods)
     end
@@ -77,9 +77,15 @@ module Monologue
         "monologue/#{model_name.route_key}/#{model_name.singular_route_key}"
       end
 
-      private
+      def ==(other)
+        return entity == other.entity
+      end
+
+      protected
 
       attr_accessor :entity
+
+      private
 
       def session
         entity.session
