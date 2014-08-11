@@ -40,8 +40,7 @@ module Monologue
 
       def tags
         # limitation - new tags are not previewed
-        tag_names = tag_list.split(",").map(&:strip).reject(&:blank?)
-        tag_names.empty? ?  [] : session.repo.tag.find_all_by_name(tag_names).map { |t| Tag::ViewAdapter.new(t) }
+        session.association(entity, :tags).values.map { |t| Tag::ViewAdapter.new(t) }
       end
 
       def save

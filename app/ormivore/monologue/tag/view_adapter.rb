@@ -7,15 +7,18 @@ module Monologue
 
       attr_accessible :name
 
+      # transient attribute
+      attr_writer :frequency
+
+      def frequency
+        @frequency or fail 'Frequency was never set on this tag adapter'
+      end
+
       # TODO how to validate uniqueness?
       #validates :name, uniqueness: true,presence: true
 
       def posts_with_tag
-        session.association(entity, :posts).select(&:published)
-      end
-
-      def frequency
-        posts_with_tag.size
+        session.association(entity, :posts).values.select(&:published)
       end
     end
   end

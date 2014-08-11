@@ -5,6 +5,8 @@ module Monologue
 
       find :all, by: 'name'
       find :first, by: 'name'
+
+      find :all, order: { name: :ascending }
     end
   end
 end

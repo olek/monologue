@@ -10,14 +10,21 @@ module Monologue
     end
 
     def recent_posts
-      @recent_posts = Monologue::PostRecord.published.limit(3)
+      @recent_posts = storage_session.repo.post.find_all_recent.map { |p| Post::ViewAdapter.new(p) }
     end
 
     def all_tags
-      @tags = Monologue::TagRecord.all(order: "name").select{|t| t.frequency>0}
+      all_tags = storage_session.repo.tag.find_all
+      frequencies_map = storage_session.repo.post.count_published_by_tags(all_tags)
+
+      @tags = all_tags
+        .reject { |t| frequencies_map[t.identity].nil? }
+        .map { |t| Tag::ViewAdapter.new(t).tap { |va| va.frequency = frequencies_map[t.identity] } }
+
       #could use minmax here but it's only supported with ruby > 1.9'
-      @tags_frequency_min = @tags.map{|t| t.frequency}.min
-      @tags_frequency_max = @tags.map{|t| t.frequency}.max
+      frequencies = frequencies_map.values
+      @tags_frequency_min = frequencies.min
+      @tags_frequency_max = frequencies.max
     end
 
     def not_found
