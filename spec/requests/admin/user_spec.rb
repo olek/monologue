@@ -2,6 +2,8 @@
 require 'spec_helper'
 describe "users" do
   let(:user) { Factory(:user) }
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+  let(:another_storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
 
   before do
     log_in user
@@ -36,9 +38,9 @@ describe "users" do
     end
 
     it "doesn't change password if none is provided" do
-      password_before = ::Monologue::UserRecord.find_by_email(user.email).password_digest
+      password_before = storage_session.repo.user.find_by_email(user.email).password_digest
       click_button "Save"
-      ::Monologue::UserRecord.find_by_email(user.email).password_digest.should eq(password_before)
+      another_storage_session.repo.user.find_by_email(user.email).password_digest.should eq(password_before)
     end
   end
 

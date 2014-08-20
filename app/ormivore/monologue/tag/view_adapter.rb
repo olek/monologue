@@ -18,7 +18,9 @@ module Monologue
       #validates :name, uniqueness: true,presence: true
 
       def posts_with_tag
-        session.association(entity, :posts).values.select(&:published)
+        session.association(entity, :posts).values.select(&:published).map { |o|
+          Post::ViewAdapter.new(o)
+        }
       end
     end
   end
