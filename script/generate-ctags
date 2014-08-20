@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find . -regex ".*\.rb$" -print | ctags --totals --recurse -L -
