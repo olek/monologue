@@ -21,8 +21,60 @@ ENGINE_RAILS_ROOT=File.join(File.dirname(__FILE__), '../')
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[File.join(ENGINE_RAILS_ROOT, "spec/support/**/*.rb")].each {|f| require f }
-# Dir[File.join(ENGINE_RAILS_ROOT, "spec/factories/**/*.rb")].each {|f| require f}
 
+module EvaluatorWithSession
+  def association(factory_name, *traits_and_overrides)
+    traits_and_overrides.last[:session] = session if respond_to?(:session)
+    super(factory_name, *traits_and_overrides)
+  end
+end
+
+module FactoryGirl
+  class Evaluator
+    prepend EvaluatorWithSession
+  end
+end
+
+FactoryGirl.define do
+  to_create { |instance|
+    if instance.respond_to?(:session)
+      # ignore, do not persist
+    else
+      instance.save!
+    end
+  }
+
+  initialize_with do
+    if !respond_to?(:session)
+      new.tap { |o|
+        attributes.each do |k, v|
+          o.send("#{k}=", v)
+        end
+      }
+    else
+      rejections = [:session, :repo]
+      entity_attrs_and_assocs = attributes.reject { |k, v| rejections.include?(k) }
+
+      session_repo = session.repo(repo)
+
+      assocs, entity_attrs = entity_attrs_and_assocs
+        .partition { |k, v|
+            session.association_definitions.detect { |o|
+              o.type == :foreign_key &&
+              o.from == session_repo.entity_class &&
+              o.as == k
+            }
+          }
+        .map { |o| Hash[o] }
+
+      session.repo(repo).create(entity_attrs).tap { |entity|
+        assocs.each do |association_name, association_value|
+          entity.session.association(entity, association_name).set(association_value)
+        end
+      }
+    end
+  end
+end
 
 Rails.backtrace_cleaner.remove_silencers!
 
@@ -61,4 +113,6 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
   end
+
+  config.backtrace_exclusion_patterns = []
 end

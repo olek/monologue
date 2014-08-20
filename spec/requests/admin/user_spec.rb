@@ -1,12 +1,17 @@
 # encoding: UTF-8
 require 'spec_helper'
 describe "users" do
+  #let(:user) { FactoryGirl.create(:orm_user, session: storage_session) }
+  #let(:user_model) { Monologue::User::ViewAdapter.new(user) }
   let(:user) { FactoryGirl.create(:user) }
+  let(:user_model) { user }
   let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
   let(:another_storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
 
   before do
     log_in user
+    #user; storage_session.commit
+    #log_in user.current
   end
 
   it "make sure the link to user edit screen is present", js: true, driver: :webkit do
@@ -15,7 +20,7 @@ describe "users" do
 
   context "edit" do
     before do
-      visit edit_admin_user_path(user)
+      visit edit_admin_user_path(user_model)
     end
 
     it "validates user name is present" do

@@ -1,7 +1,9 @@
 module MonologueSpecHelper
   module AuthenticationMock
     def sign_in_as user
-      session[:monologue_user_id] = user.id
+      # TODO remove this madness after factories are sorted out
+      id = user.respond_to?(:identity) ? user.identity : user.id
+      session[:monologue_user_id] = id
     end
   end
 end

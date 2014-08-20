@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe Monologue::ApplicationHelper do
   describe "creating the url for a given tag" do
+    let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
     before(:each) do
-      @tag= FactoryGirl.create(:tag, name: 'my_tag')
+      @tag = FactoryGirl.build(:orm_tag, name: 'my_tag', session: storage_session)
     end
 
     it "should return a well formed url for the tag" do
