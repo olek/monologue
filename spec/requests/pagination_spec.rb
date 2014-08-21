@@ -2,7 +2,7 @@
 require 'spec_helper'
 describe "pagination" do
   before(:each) do
-    22.times { |i| Factory(:post, title: "post #{i}") }
+    22.times { |i| FactoryGirl.create(:post, title: "post #{i}") }
   end
 
   it "should not show all posts" do

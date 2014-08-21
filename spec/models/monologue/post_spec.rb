@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Monologue::PostRecord do
   before(:each) do
-    @post = Factory(:post)
+    @post = FactoryGirl.create(:post)
   end
 
   it { should_not allow_mass_assignment_of(:user_id) }
@@ -19,23 +19,23 @@ describe Monologue::PostRecord do
 
   it "should create permalink (url) automatically with title and year if none is provided" do
     title = "this is a great title!!!"
-    post = Factory(:post, url: "", title: title, published_at: "2012-02-02")
+    post = FactoryGirl.create(:post, url: "", title: title, published_at: "2012-02-02")
     post.url.should == "2012/this-is-a-great-title"
   end
 
   it "should not let you create a post with a url starting with a '/'" do
-    expect { Factory(:post, url: "/whatever") }.to raise_error(ActiveRecord::RecordInvalid)
+    expect { FactoryGirl.create(:post, url: "/whatever") }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "should validate that URLs are unique to a post" do
-    post_1 = Factory(:post, url: "unique/url")
+    post_1 = FactoryGirl.create(:post, url: "unique/url")
     expect { post_1.save }.not_to raise_error()
-    expect { Factory(:post, url: "unique/url") }.to raise_error(ActiveRecord::RecordInvalid)
+    expect { FactoryGirl.create(:post, url: "unique/url") }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
 
   it "excludes the current post revision on URL uniqueness validation" do
-    pr = Factory(:post, url: nil, title: "unique title", published_at: DateTime.new(2011))
+    pr = FactoryGirl.create(:post, url: nil, title: "unique title", published_at: DateTime.new(2011))
     pr.content = "Something changed"
     pr.save
     pr.url.should == "2011/unique-title"

@@ -2,7 +2,7 @@
 require 'spec_helper'
 describe "feed" do
   before(:each) do
-    Factory(:post, url: "url/to/post")
+    FactoryGirl.create(:post, url: "url/to/post")
   end
   
   # test to prevent regression for issue #72

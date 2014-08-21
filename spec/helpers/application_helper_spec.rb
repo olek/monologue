@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Monologue::ApplicationHelper do
   describe "creating the url for a given tag" do
     before(:each) do
-      @tag= Factory(:tag, name: 'my_tag')
+      @tag= FactoryGirl.create(:tag, name: 'my_tag')
     end
 
     it "should return a well formed url for the tag" do

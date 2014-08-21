@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 describe "users" do
-  let(:user) { Factory(:user) }
+  let(:user) { FactoryGirl.create(:user) }
   let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
   let(:another_storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
 
@@ -45,8 +45,8 @@ describe "users" do
   end
 
   context "Logged in" do
-    let!(:user_without_post) { Factory(:user) }
-    let!(:user_with_post) { Factory(:user_with_post) }
+    let!(:user_without_post) { FactoryGirl.create(:user) }
+    let!(:user_with_post) { FactoryGirl.create(:user_with_post) }
 
     it "should be able to see the list of available users" do
       visit admin_users_path

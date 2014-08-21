@@ -7,8 +7,8 @@ describe "Monologue::TotalSweeper" do
     Monologue::PageCache.wipe_enabled = true
     ActionController::Base.page_cache_directory = Rails.public_path + "/my-cache-dir"
 
-    @post_1 = Factory(:post)
-    @post_2 = Factory(:post)
+    @post_1 = FactoryGirl.create(:post)
+    @post_2 = FactoryGirl.create(:post)
     FileUtils.mkdir_p("#{ActionController::Base.page_cache_directory}/monologue/post")
     FileUtils.touch "#{ActionController::Base.page_cache_directory}/monologue/#{@post_1.url}.html"
     FileUtils.touch "#{ActionController::Base.page_cache_directory}/monologue/#{@post_2.url}.html"

@@ -17,7 +17,7 @@ describe "sessions" do
     end
 
     it "won't log if bad credentials are provided" do
-      user = Factory(:user)
+      user = FactoryGirl.create(:user)
       visit admin_login_path
       fill_in "email", with:  user.email
       fill_in "Password", with:  "whatever"

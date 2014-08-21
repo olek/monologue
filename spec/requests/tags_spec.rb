@@ -7,7 +7,7 @@ describe "tags" do
 
   describe "Viewing the list of posts with tags" do
     before(:each) do
-      Factory(:post_with_tags, title: "post X")
+      FactoryGirl.create(:post_with_tags, title: "post X")
     end
 
     it "should display the tags for the posts as a link" do
@@ -19,8 +19,8 @@ describe "tags" do
 
   describe "filtering by a given tag" do
     before(:each) do
-      @post = Factory(:post_with_tags, title: "post X")
-      Factory(:post, title: "post Z")
+      @post = FactoryGirl.create(:post_with_tags, title: "post X")
+      FactoryGirl.create(:post, title: "post Z")
     end
 
     it "should only display posts with the given tag" do
@@ -32,7 +32,7 @@ describe "tags" do
     end
 
     it "should not display posts with tags with future publication date" do
-      post = Factory(:post, title: "we need to reach 88 miles per hour", published_at: DateTime.new(3000))
+      post = FactoryGirl.create(:post, title: "we need to reach 88 miles per hour", published_at: DateTime.new(3000))
       post.tag!(["rails","another tag"])
       visit "/monologue"
       click_on "Rails"

@@ -22,7 +22,7 @@ describe "posts" do
     end
 
     it "can edit a post and then save the post" do
-      post = Factory(:post, title: "my title")
+      post = FactoryGirl.create(:post, title: "my title")
       visit admin_posts_path
       click_on "my title"
       page.should have_content "Edit \""
@@ -57,7 +57,7 @@ describe "posts" do
     end
 
     it "can update the tags of an edited post" do
-      Factory(:post, title: "my title")
+      FactoryGirl.create(:post, title: "my title")
       visit admin_posts_path
       click_on "my title"
       fill_in "Tags",with: "ruby, spree"
@@ -78,7 +78,7 @@ describe "posts" do
     end
     
     it "can NOT edit posts" do
-      post = Factory(:post)
+      post = FactoryGirl.create(:post)
       visit edit_admin_post_path(post)
       page.should have_content "You must first log in"
     end

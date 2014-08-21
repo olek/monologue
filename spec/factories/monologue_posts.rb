@@ -16,7 +16,6 @@ FactoryGirl.define do
   end
 
   factory :post_with_tags, class: Monologue::PostRecord, parent: :post do |post|
-    post.after_create { |p| p.tag!(['Rails', 'a great tag'])}
+    after(:create) { |p| p.tag!(['Rails', 'a great tag'])}
   end
-
 end

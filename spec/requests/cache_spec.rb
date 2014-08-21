@@ -3,11 +3,11 @@ require 'spec_helper'
 describe "cache" do
   context "enabled" do
     before do
-      @post_1 = Factory(:post)
-      @post_2 = Factory(:post)
-      @post_3 = Factory(:post)
-      25.times { |i| Factory(:post, title: "post #{i}", url: "post/#{i*100}") }
-      @post_with_tag = Factory(:post_with_tags)
+      @post_1 = FactoryGirl.create(:post)
+      @post_2 = FactoryGirl.create(:post)
+      @post_3 = FactoryGirl.create(:post)
+      25.times { |i| FactoryGirl.create(:post, title: "post #{i}", url: "post/#{i*100}") }
+      @post_with_tag = FactoryGirl.create(:post_with_tags)
       ActionController::Base.perform_caching = true
       Monologue::PageCache.enabled = true
       clear_cache
@@ -48,7 +48,7 @@ describe "cache" do
       end
 
       it "should clear cache on create" do
-        post = Factory(:post)
+        post = FactoryGirl.create(:post)
         cache_sweeped?(["/monologue"]).should be_true
         cache_sweeped?(["/monologue/#{@post_2.url}", "/monologue/#{@post_3.url}"]).should be_false
         cache_sweeped?([feed_path], "rss").should be_true
@@ -130,14 +130,14 @@ describe "cache" do
       end
 
       it "do not cache pages" do
-        post_1 = Factory(:post)
+        post_1 = FactoryGirl.create(:post)
         url = "/monologue/#{post_1.url}"
         visit url
         url.is_page_cached?.should be_false
       end
 
       it "do not cache tag pages" do
-        post = Factory(:post_with_tags)
+        post = FactoryGirl.create(:post_with_tags)
         tag_page = "/monologue/tags/rails"
         visit tag_page
         tag_page.is_page_cached?.should be_false
@@ -149,8 +149,8 @@ describe "cache" do
         ActionController::Base.perform_caching = true
         Monologue::PageCache.enabled = true
         Monologue::PageCache.wipe_enabled = true
-        @post_1 = Factory(:post)
-        @post_2 = Factory(:post)
+        @post_1 = FactoryGirl.create(:post)
+        @post_2 = FactoryGirl.create(:post)
       end
 
       context "wipe enabled" do
@@ -160,7 +160,7 @@ describe "cache" do
           before { ActionController::Base.page_cache_directory = Rails.public_path + "/my-cache-dir" }
 
           it "wipe all cache after save if wipe_after_save is true" do
-            Factory(:post_with_tags)
+            FactoryGirl.create(:post_with_tags)
             visit "/monologue/#{@post_1.url}"
             visit "/monologue/#{@post_2.url}"
             @post_1.save!
@@ -199,7 +199,7 @@ describe "cache" do
       it "do not cache pages" do
         ActionController::Base.perform_caching = false
         Monologue::PageCache.enabled = true
-        post_1 = Factory(:posts_revision).post
+        post_1 = FactoryGirl.create(:posts_revision).post
         visit "/monologue/#{post_1.active_revision.url}"
         page.page_cached?
         #page_cached?(["/monologue/#{post_1.active_revision.url}"]).should be_true

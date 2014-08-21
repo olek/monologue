@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'select2-rails', '~> 3.2'
 
   s.add_development_dependency "rspec-rails", "~> 2.8"
-  s.add_development_dependency 'factory_girl_rails', '~> 1.4.0'
+  s.add_development_dependency 'factory_girl_rails', '~> 4.4.1'
   s.add_development_dependency "capybara", "~> 1.1.4"
   s.add_development_dependency "capybara-webkit"
   s.add_development_dependency "shoulda"

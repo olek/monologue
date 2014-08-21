@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Monologue::TagRecord do
   before(:each) do
-    @tag= Factory(:tag)
+    @tag= FactoryGirl.create(:tag)
   end
 
   it "is valid with valid attributes" do
@@ -11,11 +11,11 @@ describe Monologue::TagRecord do
 
   describe "validations" do
     it "is not possible to have save another tag with the same name" do
-       expect { Factory(:tag) }.to raise_error(ActiveRecord::RecordInvalid)
+       expect { FactoryGirl.create(:tag) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "should require the name to be set" do
-      expect { Factory(:tag,name:nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { FactoryGirl.create(:tag,name:nil) }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 end

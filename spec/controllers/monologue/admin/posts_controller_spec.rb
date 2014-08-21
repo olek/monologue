@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Monologue::Admin::PostsController do
-  let(:user) { create(:user) }
+  let(:user) { FactoryGirl.create(:user) }
   before do
     sign_in_as user
     @routes = Monologue::Engine.routes

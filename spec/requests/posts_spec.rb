@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe "posts" do
   before(:each) do
-    Factory(:post, title: "post X")
+    FactoryGirl.create(:post, title: "post X")
   end
 
   it "lists posts" do
@@ -27,7 +27,7 @@ describe "posts" do
   end
 
   it "should not show post with published date in the future" do
-    Factory(:post, published_at: DateTime.new(3000), title: "I am Marty McFly")
+    FactoryGirl.create(:post, published_at: DateTime.new(3000), title: "I am Marty McFly")
     visit root_path
     page.should_not have_content "I am Marty McFly"
   end

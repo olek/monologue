@@ -7,8 +7,8 @@ describe "tag category" do
   describe "Viewing the tag category" do
 
     before(:each) do
-      Factory(:post_with_tags)
-      post = Factory(:post, title: "Future post", published_at: DateTime.new(3000))
+      FactoryGirl.create(:post_with_tags)
+      post = FactoryGirl.create(:post, title: "Future post", published_at: DateTime.new(3000))
       post.tag!(["Rails", "another tag"])
     end
 

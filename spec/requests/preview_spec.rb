@@ -4,7 +4,7 @@ describe "preview" do
     url ="post/1"
     @post_path = "/monologue/#{url}"
     @post_title = "post 1"
-    @post = Factory(:post, title: @post_title, url: url)
+    @post = FactoryGirl.create(:post, title: @post_title, url: url)
     ActionController::Base.perform_caching = true
     clear_cache
   end
@@ -16,7 +16,7 @@ describe "preview" do
   
   it "verify unpublished posts are not public" do
     visit root_path
-    Factory(:unpublished_post)
+    FactoryGirl.create(:unpublished_post)
     page.should_not have_content("unpublished")
     visit "/monologue/unpublished"
     page.should have_content("You may have mistyped the address or the page may have moved")
