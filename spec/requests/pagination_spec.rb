@@ -1,8 +1,11 @@
 # encoding: UTF-8
 require 'spec_helper'
 describe "pagination" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
   before(:each) do
-    22.times { |i| FactoryGirl.create(:post, title: "post #{i}") }
+    22.times { |i| FactoryGirl.build(:orm_post, title: "post #{i}", session: storage_session) }
+    storage_session.commit
   end
 
   it "should not show all posts" do

@@ -1,5 +1,7 @@
 require 'spec_helper'
 describe "sessions" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
   context "logged in user" do
     before(:each) do
       log_in
@@ -17,7 +19,9 @@ describe "sessions" do
     end
 
     it "won't log if bad credentials are provided" do
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.build(:orm_user, session: storage_session)
+      storage_session.commit
+
       visit admin_login_path
       fill_in "email", with:  user.email
       fill_in "Password", with:  "whatever"

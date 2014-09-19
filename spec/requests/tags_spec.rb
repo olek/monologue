@@ -1,5 +1,6 @@
 require 'spec_helper'
 describe "tags" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
 
   after do
     clear_cache
@@ -7,7 +8,8 @@ describe "tags" do
 
   describe "Viewing the list of posts with tags" do
     before(:each) do
-      FactoryGirl.create(:post_with_tags, title: "post X")
+      FactoryGirl.build(:orm_post_with_tags, title: "post X", session: storage_session)
+      storage_session.commit
     end
 
     it "should display the tags for the posts as a link" do
@@ -19,8 +21,9 @@ describe "tags" do
 
   describe "filtering by a given tag" do
     before(:each) do
-      @post = FactoryGirl.create(:post_with_tags, title: "post X")
-      FactoryGirl.create(:post, title: "post Z")
+      FactoryGirl.build(:orm_post_with_tags, title: "post X", session: storage_session)
+      FactoryGirl.build(:orm_post_with_tags, title: "post Z", session: storage_session)
+      storage_session.commit
     end
 
     it "should only display posts with the given tag" do
@@ -32,8 +35,12 @@ describe "tags" do
     end
 
     it "should not display posts with tags with future publication date" do
-      post = FactoryGirl.create(:post, title: "we need to reach 88 miles per hour", published_at: DateTime.new(3000))
-      post.tag!(["rails","another tag"])
+      post = FactoryGirl.build(:orm_post, title: "we need to reach 88 miles per hour", published_at: DateTime.new(3000), session: storage_session)
+      post.session.association(post.current, :tags).add(
+        FactoryGirl.build(:orm_tag, name: 'rails', session: post.session),
+      )
+      storage_session.commit
+
       visit "/monologue"
       click_on "Rails"
       page.should have_content("post X")

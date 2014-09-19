@@ -1,10 +1,13 @@
 require 'spec_helper'
 describe "preview" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
   before(:each) do
     url ="post/1"
     @post_path = "/monologue/#{url}"
     @post_title = "post 1"
-    @post = FactoryGirl.create(:post, title: @post_title, url: url)
+    @post = FactoryGirl.build(:orm_post, title: @post_title, url: url, session: storage_session)
+    storage_session.commit
     ActionController::Base.perform_caching = true
     clear_cache
   end
@@ -16,7 +19,8 @@ describe "preview" do
   
   it "verify unpublished posts are not public" do
     visit root_path
-    FactoryGirl.create(:unpublished_post)
+    FactoryGirl.build(:orm_unpublished_post, session: storage_session)
+    storage_session.commit
     page.should_not have_content("unpublished")
     visit "/monologue/unpublished"
     page.should have_content("You may have mistyped the address or the page may have moved")

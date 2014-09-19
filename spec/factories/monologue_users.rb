@@ -16,15 +16,15 @@ FactoryGirl.define do
 
     sequence(:name){|n| "test #{n}"}
     sequence(:email){ |n| "orm_test#{n}@example.com"}
-    password_digest '$2a$10$6xL549QtdvsdZm0Y4Mm47Oygmj5t5vpnaFMNMVXeAPjf7t3nSuiv6' # 'password'
+    password_digest '$2a$10$iz2rJFWRF.oFpamGVNYim.bpE5N0ldwqrxgD5SRCM0PGKL6AMJ2Vi' # 'password'
   end
 
-  factory :orm_user_with_post, parent: :user do
+  factory :orm_user_with_post, parent: :orm_user do
     # after(:create) { |u| FactoryGirl.create(:post, user: u) }
 
     after(:build) do |user|
       user.session.association(user, :posts).add(
-        FactoryGirl.build(:orm_post, session: user.session)
+        FactoryGirl.build(:orm_post, session: user.session).current
       )
     end
   end

@@ -1,17 +1,14 @@
 # encoding: UTF-8
 require 'spec_helper'
 describe "users" do
-  #let(:user) { FactoryGirl.create(:orm_user, session: storage_session) }
-  #let(:user_model) { Monologue::User::ViewAdapter.new(user) }
-  let(:user) { FactoryGirl.create(:user) }
-  let(:user_model) { user }
+  let!(:user) { FactoryGirl.build(:orm_user, session: storage_session) }
+  let(:user_model) { Monologue::User::ViewAdapter.new(user.current) }
   let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
-  let(:another_storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
 
   before do
-    log_in user
-    #user; storage_session.commit
-    #log_in user.current
+    storage_session.commit
+    log_in user.current
+    #puts "DDDDDD: pd = #{user.password_digest}"
   end
 
   it "make sure the link to user edit screen is present", js: true, driver: :webkit do
@@ -43,17 +40,22 @@ describe "users" do
     end
 
     it "doesn't change password if none is provided" do
-      password_before = storage_session.repo.user.find_by_email(user.email).password_digest
+      u = storage_session.repo.user.find_by_email(user.email)
       click_button "Save"
-      another_storage_session.repo.user.find_by_email(user.email).password_digest.should eq(password_before)
+      storage_session.reset
+      u.current.password_digest.should eq(u.password_digest)
     end
   end
 
   context "Logged in" do
-    let!(:user_without_post) { FactoryGirl.create(:user) }
-    let!(:user_with_post) { FactoryGirl.create(:user_with_post) }
+    let!(:user_without_post) { FactoryGirl.build(:orm_user, session: storage_session) }
+    let!(:user_with_post) { FactoryGirl.build(:orm_user_with_post, session: storage_session) }
+    let(:user_without_post_model) { Monologue::User::ViewAdapter.new(user_without_post.current) }
+    let(:user_with_post_model) { Monologue::User::ViewAdapter.new(user_with_post.current) }
 
     it "should be able to see the list of available users" do
+      storage_session.commit
+
       visit admin_users_path
       page.should have_content(user_without_post.email)
       page.should have_content(user_with_post.email)
@@ -71,11 +73,13 @@ describe "users" do
     end
 
     it "should not be able to delete user with posts" do
+      storage_session.commit
+
       visit admin_users_path
       delete= I18n.t("monologue.admin.users.index.delete")
-      page.should_not have_link(delete, href: admin_user_path(user_with_post))
-      page.should_not have_link(delete, href: admin_user_path(user))
-      page.should have_link(delete, href: admin_user_path(user_without_post))
+      page.should_not have_link(delete, href: admin_user_path(user_with_post_model))
+      page.should_not have_link(delete, href: admin_user_path(user_model))
+      page.should have_link(delete, href: admin_user_path(user_without_post_model))
     end
   end
 end

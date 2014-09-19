@@ -1,7 +1,10 @@
 require 'spec_helper'
 describe "posts" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
   before(:each) do
-    FactoryGirl.create(:post, title: "post X")
+    FactoryGirl.build(:orm_post, title: "post X", session: storage_session)
+    storage_session.commit
   end
 
   it "lists posts" do
@@ -27,7 +30,9 @@ describe "posts" do
   end
 
   it "should not show post with published date in the future" do
-    FactoryGirl.create(:post, published_at: DateTime.new(3000), title: "I am Marty McFly")
+    FactoryGirl.build(:orm_post, published_at: DateTime.new(3000), title: "I am Marty McFly", session: storage_session)
+    storage_session.commit
+
     visit root_path
     page.should_not have_content "I am Marty McFly"
   end

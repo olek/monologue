@@ -1,8 +1,11 @@
 # encoding: UTF-8
 require 'spec_helper'
 describe "feed" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
   before(:each) do
-    FactoryGirl.create(:post, url: "url/to/post")
+    FactoryGirl.build(:orm_post, url: "url/to/post", session: storage_session)
+    storage_session.commit
   end
   
   # test to prevent regression for issue #72

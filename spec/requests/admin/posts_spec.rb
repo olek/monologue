@@ -1,6 +1,8 @@
 # encoding: UTF-8
 require 'spec_helper'
 describe "posts" do
+  let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
+
   context "logged in user" do
     before(:each) do
       log_in
@@ -22,7 +24,9 @@ describe "posts" do
     end
 
     it "can edit a post and then save the post" do
-      post = FactoryGirl.create(:post, title: "my title")
+      post = FactoryGirl.build(:orm_post, title: "my title", session: storage_session)
+      storage_session.commit_and_reset
+
       visit admin_posts_path
       click_on "my title"
       page.should have_content "Edit \""
@@ -32,9 +36,8 @@ describe "posts" do
       click_button "Save"
 
       page.should have_content "Monologue saved"
-      post.reload
-      post.content.should ==  "New content here..."
-      post.title.should ==  "This is a new title"
+      post.current.content.should ==  "New content here..."
+      post.current.title.should ==  "This is a new title"
     end
     
     it "will output error messages if error(s) there is" do
@@ -57,7 +60,8 @@ describe "posts" do
     end
 
     it "can update the tags of an edited post" do
-      FactoryGirl.create(:post, title: "my title")
+      FactoryGirl.build(:orm_post, title: "my title", session: storage_session)
+      storage_session.commit
       visit admin_posts_path
       click_on "my title"
       fill_in "Tags",with: "ruby, spree"
@@ -78,8 +82,11 @@ describe "posts" do
     end
     
     it "can NOT edit posts" do
-      post = FactoryGirl.create(:post)
-      visit edit_admin_post_path(post)
+      post = FactoryGirl.build(:orm_post, session: storage_session)
+      storage_session.commit
+      post_model = Monologue::Post::ViewAdapter.new(post.current)
+
+      visit edit_admin_post_path(post_model)
       page.should have_content "You must first log in"
     end
   end  

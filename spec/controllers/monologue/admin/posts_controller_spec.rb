@@ -25,7 +25,7 @@ describe Monologue::Admin::PostsController do
             content: new_content,
             title: new_title
           }
-        storage_session.commit_and_reset
+        storage_session.reset
         @post = post.current
       end
 
