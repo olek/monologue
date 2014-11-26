@@ -9,7 +9,7 @@ describe Monologue::Admin::PostsController do
   end
 
   describe 'PUT #update' do
-    let(:post) { FactoryGirl.build(:orm_post, session: storage_session) } #, user: user.current) }
+    let(:post) { FactoryGirl.build(:orm_post, session: storage_session) } #, user: user) }
     let(:new_content) { 'This is the new content, for real!' }
     let(:new_title) { 'nothing to do, I find it awesome!' }
 
@@ -17,16 +17,16 @@ describe Monologue::Admin::PostsController do
       before do
         user; post # create them
         storage_session.commit
-        sign_in_as user.current
+        sign_in_as user
 
         put :update,
-          id: post.current.identity,
+          id: post.identity,
           post: {
             content: new_content,
             title: new_title
           }
         storage_session.reset
-        @post = post.current
+        @post = post
       end
 
       it { expect(@post.content).to eq new_content }

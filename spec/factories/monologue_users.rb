@@ -24,7 +24,7 @@ FactoryGirl.define do
 
     after(:build) do |user|
       user.session.association(user, :posts).add(
-        FactoryGirl.build(:orm_post, session: user.session).current
+        FactoryGirl.build(:orm_post, session: user.session)
       )
     end
   end

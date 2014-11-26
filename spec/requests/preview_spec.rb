@@ -19,7 +19,7 @@ describe "preview" do
   
   it "verify unpublished posts are not public" do
     visit root_path
-    FactoryGirl.build(:orm_unpublished_post, session: storage_session)
+    ttt = FactoryGirl.build(:orm_unpublished_post, session: storage_session)
     storage_session.commit
     page.should_not have_content("unpublished")
     visit "/monologue/unpublished"

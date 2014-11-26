@@ -8,7 +8,7 @@ module Monologue
               entity.#{attr}
             end
             def #{attr}=(value)
-              self.entity = entity.apply(#{attr}: value)
+              entity.apply(#{attr}: value)
             end
           EOS
         end
@@ -81,6 +81,7 @@ module Monologue
         return entity == other.entity
       end
 
+
       protected
 
       attr_accessor :entity
@@ -92,13 +93,11 @@ module Monologue
       end
 
       def apply_sanitized_attributes(values)
-        self.entity = entity.apply(values)
+        entity.apply(values)
       end
 
       def persist
         session.commit
-
-        self.entity = entity.current
       end
     end
   end

@@ -36,8 +36,8 @@ describe "posts" do
       click_button "Save"
 
       page.should have_content "Monologue saved"
-      post.current.content.should ==  "New content here..."
-      post.current.title.should ==  "This is a new title"
+      post.content.should ==  "New content here..."
+      post.title.should ==  "This is a new title"
     end
     
     it "will output error messages if error(s) there is" do
@@ -84,7 +84,7 @@ describe "posts" do
     it "can NOT edit posts" do
       post = FactoryGirl.build(:orm_post, session: storage_session)
       storage_session.commit
-      post_model = Monologue::Post::ViewAdapter.new(post.current)
+      post_model = Monologue::Post::ViewAdapter.new(post)
 
       visit edit_admin_post_path(post_model)
       page.should have_content "You must first log in"

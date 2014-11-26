@@ -60,7 +60,7 @@ module Monologue
       end
 
       def generate_url
-        self.entity = entity.actions.generate_url
+        entity.actions.generate_url
       end
 
       def persist

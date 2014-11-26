@@ -2,12 +2,12 @@
 require 'spec_helper'
 describe "users" do
   let!(:user) { FactoryGirl.build(:orm_user, session: storage_session) }
-  let(:user_model) { Monologue::User::ViewAdapter.new(user.current) }
+  let(:user_model) { Monologue::User::ViewAdapter.new(user) }
   let(:storage_session) { ORMivore::Session.new(Monologue::Repos, Monologue::Associations) }
 
   before do
     storage_session.commit
-    log_in user.current
+    log_in user
     #puts "DDDDDD: pd = #{user.password_digest}"
   end
 
@@ -43,15 +43,15 @@ describe "users" do
       u = storage_session.repo.user.find_by_email(user.email)
       click_button "Save"
       storage_session.reset
-      u.current.password_digest.should eq(u.password_digest)
+      u.password_digest.should eq(u.password_digest)
     end
   end
 
   context "Logged in" do
     let!(:user_without_post) { FactoryGirl.build(:orm_user, session: storage_session) }
     let!(:user_with_post) { FactoryGirl.build(:orm_user_with_post, session: storage_session) }
-    let(:user_without_post_model) { Monologue::User::ViewAdapter.new(user_without_post.current) }
-    let(:user_with_post_model) { Monologue::User::ViewAdapter.new(user_with_post.current) }
+    let(:user_without_post_model) { Monologue::User::ViewAdapter.new(user_without_post) }
+    let(:user_with_post_model) { Monologue::User::ViewAdapter.new(user_with_post) }
 
     it "should be able to see the list of available users" do
       storage_session.commit

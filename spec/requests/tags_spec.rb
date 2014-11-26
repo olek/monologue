@@ -36,7 +36,7 @@ describe "tags" do
 
     it "should not display posts with tags with future publication date" do
       post = FactoryGirl.build(:orm_post, title: "we need to reach 88 miles per hour", published_at: DateTime.new(3000), session: storage_session)
-      post.session.association(post.current, :tags).add(
+      post.session.association(post, :tags).add(
         FactoryGirl.build(:orm_tag, name: 'rails', session: post.session),
       )
       storage_session.commit

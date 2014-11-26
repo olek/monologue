@@ -40,7 +40,7 @@ FactoryGirl.define do
   factory :orm_post_with_tags, parent: :orm_post do
     # after(:create) { |p| p.tag!(['Rails', 'a great tag'])}
     after(:build) do |post|
-      post.session.association(post.current, :tags).add(
+      post.session.association(post, :tags).add(
         FactoryGirl.build(:orm_tag, name: 'Rails', session: post.session),
         FactoryGirl.build(:orm_tag, name: 'a great tag', session: post.session)
       )
