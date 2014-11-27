@@ -24,8 +24,9 @@ gem "coffee-rails"
 
 group :development, :test do
   gem "thin"
-  gem 'rails', '3.2.14'
+  gem 'rails', '~>3.2.14'
   gem 'pry'
+  gem 'rspec', '~>2.14.1'
 
   if RUBY_PLATFORM.downcase.include?("darwin")
     gem 'rb-fsevent'
