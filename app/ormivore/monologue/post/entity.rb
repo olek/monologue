@@ -11,9 +11,6 @@ module Monologue
         time :published_at
         integer :user_id
       end
-
-      responsibility :questions, Questions
-      responsibility :actions, Actions
     end
   end
 end

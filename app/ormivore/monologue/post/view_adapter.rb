@@ -27,7 +27,7 @@ module Monologue
       end
 
       def published_in_future?
-        entity.questions.published_in_future?
+        Questions.published_in_future?(entity)
       end
 
       def full_url
@@ -60,7 +60,7 @@ module Monologue
       end
 
       def generate_url
-        entity.actions.generate_url
+        Actions.generate_url(entity)
       end
 
       def persist
