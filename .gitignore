@@ -11,6 +11,7 @@ coverage/
 
 .DS_Store
 .dropbox
+tags
 
 .idea/
 .idea/**/*

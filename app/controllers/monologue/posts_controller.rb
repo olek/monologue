@@ -10,23 +10,21 @@ module Monologue
     end
 
     def show
+      @post = post_repo.find_by_url(params[:post_url])
       if monologue_current_user
         #@post = Monologue::PostRecord.default.where("url = :url", {url: params[:post_url]}).first
-        @post = post_repo.find_by_url(params[:post_url])
-        @post = Post::ViewAdapter.new(@post) if @post
       else
         #@post = Monologue::PostRecord.published.where("url = :url", {url: params[:post_url]}).first
-        @post = post_repo.find_by_url(params[:post_url])
         @post = nil if @post && !@post.published
-        @post = Post::ViewAdapter.new(@post) if @post
       end
-      if @post.nil?
+      if @post
+        @post = Post::ViewAdapter.new(@post)
+      else
         not_found
       end
     end
 
     def feed
-      # FIXME Ugh, limiting after filtering is going to be TOUGH
       #@posts = Monologue::PostRecord.published.limit(25)
       @posts = post_repo.find_all_for_feed_listing.map { |p| Post::ViewAdapter.new(p) }
     end

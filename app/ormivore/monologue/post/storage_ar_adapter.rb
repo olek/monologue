@@ -10,11 +10,11 @@ module Monologue
         Hash[
           ar_class.connection.select_all(
             ar_class
-              .select('monologue_taggings.tag_id as id, count(*) as count')
-              .joins('inner join monologue_taggings on monologue_taggings.post_id = monologue_posts.id')
-              .where('monologue_taggings.tag_id' => tag_ids)
+              .select('tgn.tag_id as id, count(*) as count')
+              .joins('inner join monologue_taggings as tgn on tgn.post_id = monologue_posts.id')
+              .where('tgn.tag_id' => tag_ids)
               .where(published: true).where("published_at <= ?", DateTime.now)
-              .group('monologue_taggings.tag_id')
+              .group('tgn.tag_id')
           ).map { |h|
             [Integer(h['id']), Integer(h['count'])]
           }
