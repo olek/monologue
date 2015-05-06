@@ -1,6 +1,10 @@
 module Monologue
   module Post
-    module Actions
+    module Functions
+      def published_in_future?(entity)
+        entity.published && entity.published_at > DateTime.now
+      end
+
       def generate_url(entity)
         return entity unless entity.url.blank?
         return entity unless entity.title
@@ -14,3 +18,4 @@ module Monologue
     end
   end
 end
+
